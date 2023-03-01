@@ -1,0 +1,131 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    touch-action: none;
+}
+
+h4,
+h5,
+h6 {
+    text-align: center;
+    padding: 8px 0 8px;
+    border-bottom: 1px solid #eee;
+}
+
+#welcome {
+    position: absolute;
+    top: 30px;
+    left: 20px;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.btn {
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin: 4px;
+    border-radius: 3px;
+}
+
+.btn-blue {
+    background-color: cornflowerblue;
+    color: azure;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#set-color ul {
+    display: flex;
+
+}
+
+#set-color {
+    width: 100%;
+    border: 1px solid rgb(0, 100, 0);
+    border-radius: 5px;
+}
+
+#set-color li {
+    width: 15px;
+    height: 15px;
+    background-color: black;
+    margin: 4px;
+}
+
+.ctl-row {
+    border: 1px solid darkgreen;
+    background-color: beige;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 6px;
+    margin: 2px 0 2px;
+}
+
+.box-sh {
+    box-shadow: 0px 0px 8px 3px #bbb;
+}
+
+#msg {
+    overflow-y: scroll;
+    padding: 0 10px 0;
+    min-height: 400px;
+    max-height: 600px;
+}
+
+#info {
+    padding: 10px;
+    overflow: scroll
+}
+
+input[type=text] {
+    height: 20px;
+    font-size: 16px;
+    margin: 5px;
+    width: 90%;
+}
+
+.bot_box {
+    width: 1000px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+}
+
+.bot_box :nth-child(1) {
+    width: 280px;
+}
+
+.bot_box :nth-child(2) {
+    width: 380px;
+}
+
+.bot_box :nth-child(3) {
+    width: 280px;
+}
+
+.info_box {
+    width: 370px;
+    position: absolute;
+    top: 83px;
+    left: 1020px;
+}
+
+/* #shangc_box {
+    
+} */

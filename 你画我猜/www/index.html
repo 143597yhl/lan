@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>你画我猜</title>
+    <link href="index.css" rel="stylesheet" />
+</head>
+
+<body>
+    <main class="container">
+        <div id="welcome">haha</div>
+        <h1 style="margin-left: 600px; padding: 20px;">实时「你画我猜」</h1>
+        <div class="row">
+            <div style="float: left;width: 100%;">
+                <div style="margin-left:10px;margin-right: 400px;">
+                    <div class="box-sh" style="width: 1000px; height: 700px;">
+                        <canvas height="600" width="1000" id="canvas"></canvas>
+                        <div>
+                            <div style="display: inline-block; background-color: rgb(245,245,220)" id="set-color">
+                                <span>颜色</span>
+                                <ul>
+                                    <li data-color="red" style="background-color:red;"></li>
+                                    <li data-color="green" style="background-color:green;"></li>
+                                    <li data-color="blue" style="background-color:blue;"></li>
+                                    <li data-color="pink" style="background-color:pink;"></li>
+                                    <li data-color="orange" style="background-color:orange;"></li>
+                                    <li data-color="#FFFF00" style="background-color:#FFFF00;"></li>
+                                    <li data-color="#800080" style="background-color:#800080;"></li>
+                                    <li data-color="#000000" style="background-color:#000000;"></li>
+                                </ul>
+                            </div>
+
+                            <div class="ctl-row">
+                                <span class="text-blue fl" style="padding:0 4px 0; margin-top: 8px;">线宽</span>
+                                <input style="margin-top: 8px;" id="xiank" type="range" value="1" min="1" step="1"
+                                    max="10" />
+                                <span id="xiank_num">1</span>
+                                <div class="fr">
+                                    <a class="btn btn-blue btn-active-able">画笔</a>
+                                    <a class="btn btn-blue btn-active-able">橡皮擦</a>
+                                    <a class="btn btn-blue" id="qingkong">清空</a>
+                                    <a class="btn btn-blue">下载</a>
+                                </div>
+                                <div style="clear: both;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="box-sh info_box">
+                    <h3 style="text-align: center;">消息框</h3>
+                    <div id="xiaoxi" style="height: 500px; text-align: left;"></div>
+                    <input type="text" id="msgs" placeholder="输入消息或者词语，回车键发送" />
+                </div>
+
+
+                <div style="margin-top: 20px" class="bot_box">
+                    <div class="box-sh" id="shangc_box" style="height: 130px;">
+                        <h4>上场玩家</h4>
+                        <span id="shangc"
+                            style="position: relative; top: 68px; left: 150px; color: white; border-radius: 3px; padding: 2px; background-color: rgb(94,149,243);">上场！</span>
+                        <span
+                            style="position: relative; top: 68px; left: 150px; color: white; border-radius: 3px; padding: 2px; background-color: rgb(94,149,243);">自动上场</span>
+                    </div>
+
+                    <div class="box-sh">
+                        <h4 style="margin-left: 50px;">信息栏</h4>
+                        <div>
+                            <p>绘图玩家: </p>
+                            <p style="margin-top: 10px;">剩余时间：</p>
+                            <p style="margin-top: 10px;">关键词语：</p>
+                        </div>
+                    </div>
+
+                    <div class="box-sh">
+                        <h4>排行榜</h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+<script src="./jquery-3.6.0.min.js"></script>
+<script>
+    let colorLi = document.querySelectorAll("#set-color li");
+    let cv = document.querySelector("#canvas");
+    let ctx = cv.getContext("2d");
+    let target = null
+    let nickname = null
+    let ws = null
+
+    while (!nickname) {
+        nickname = prompt("请输入昵称")
+    }
+    ws = new WebSocket("ws://192.168.124.11:3000/" + nickname)
+    ws.onopen = function () {
+        console.log('连接成功');
+    }
+    $("#shangc").click(function () {
+        ws.send(JSON.stringify({
+            type: 'shangc',
+            shangc: true,
+            nickname: nickname
+        }))
+    })
+
+    ws.onmessage = function (res) {
+        let dataObj = JSON.parse(res.data)
+        switch (dataObj.type) {
+            case 'caog':
+                while (dataObj.caog) {
+                    alert('傻狗曹海洋禁止入内')
+                }
+                break;
+            case 'welcome':
+                $('#welcome').text(dataObj.content)
+                break;
+            case 'shangc':
+                console.log(dataObj);
+                let $shangcUser = $("<p class='nickname'></p>").text(dataObj.nickname)
+                $('#shangc_box').append($shangcUser)
+                if (dataObj.vip) {
+                    cv.onmousedown = function (e1) {
+                        ctx.beginPath();
+                        ctx.moveTo(e1.pageX - cv.offsetLeft, e1.pageY - cv.offsetTop);
+                        let x1 = e1.pageX - cv.offsetLeft
+                        let y1 = e1.pageY - cv.offsetTop
+                        sendDown(x1, y1)
+                        document.onmousemove = function (e2) {
+                            ctx.lineTo(e2.pageX - cv.offsetLeft, e2.pageY - cv.offsetTop);
+                            ctx.stroke();
+                            let x = e2.pageX - cv.offsetLeft
+                            let y = e2.pageY - cv.offsetTop
+                            let w = ctx.lineWidth
+                            let c = ctx.strokeStyle
+                            sendMove(x, y, w, c)
+                        }
+                    }
+                }
+
+
+
+                break;
+            case "group":
+                console.log(dataObj.content);
+                let $name = $("<span class='nickname'></span>").text(dataObj.nickname)
+                let $content = $("<span></span><br></br>").text(":  " + dataObj.content)
+                $('#xiaoxi').append($name).append($content)
+                break;
+            case "down":
+                ctx.beginPath();
+                ctx.moveTo(dataObj.x1, dataObj.y1);
+                break;
+            case "clear":
+                ctx.clearRect(0, 0, 1000, 600);
+                break;
+            case "move":
+                ctx.strokeStyle = dataObj.c
+                ctx.lineWidth = dataObj.w
+                ctx.lineTo(dataObj.x, dataObj.y);
+                ctx.stroke();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    window.onkeydown = function (e) {
+        if (e.keyCode === 13) {
+            sendMessage()
+        }
+    }
+    function sendMessage() {
+        let msg = $("#msgs").val().trim();
+        if (!msg) {
+            alert("聊天内容不能为空")
+            return
+        }
+        ws.send(JSON.stringify({
+            type: 'group',
+            data: msg,
+        }))
+        $("#msgs").val("")
+    }
+
+    function sendDown(x1, y1) {
+        ws.send(JSON.stringify({
+            type: 'down',
+            data: {
+                x1,
+                y1,
+            },
+        }))
+    }
+    function sendMove(x, y, w, c) {
+        ws.send(JSON.stringify({
+            type: 'move',
+            data: {
+                x,
+                y,
+                w,
+                c
+            },
+        }))
+    }
+    colorLi.forEach(li => {
+        li.onclick = function () {
+            ctx.strokeStyle = this.dataset.color;
+        }
+    })
+
+    $("#qingkong").click(function () {
+        ws.send(JSON.stringify({
+            type: 'clear',
+        }))
+        ctx.clearRect(0, 0, 1000, 600);
+    })
+    document.onmouseup = function () {
+        document.onmousemove = null;
+    }
+    $("#xiank").click(function (e) {
+        $("#xiank_num").text(e.target.value)
+        ctx.lineWidth = e.target.value
+    })
+</script>
+
+</html>
